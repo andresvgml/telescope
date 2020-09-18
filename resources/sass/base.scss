@@ -5,14 +5,6 @@ body {
     padding-bottom: 20px;
 }
 
-.container {
-    width: 1140px;
-}
-
-html {
-    min-width: 1140px;
-}
-
 [v-cloak] {
     display: none;
 }
@@ -267,4 +259,20 @@ button:hover {
     padding: 0.75rem;
     color: #fff;
     background: $danger;
+}
+
+.profile-section {
+    border-bottom: 1px solid $table-border-color;
+}
+
+.img-avatar {
+    border-radius: 50%;
+    width: 30px;
+    height: 30px;
+}
+
+@media (min-width: 768px){
+    .bd-links {
+        display: block!important;
+    }
 }

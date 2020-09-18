@@ -15,6 +15,7 @@
         data() {
             return {
                 tag: '',
+                tags: [],
                 familyHash: '',
                 entries: [],
                 ready: false,
@@ -60,6 +61,8 @@
             this.updateTimeAgo();
 
             this.focusOnSearch();
+
+            this.loadTags();
         },
 
 
@@ -99,6 +102,8 @@
 
                     this.ready = true;
                 });
+
+                this.loadTags();
             },
         },
 
@@ -259,6 +264,13 @@
                         }
                     }
                 };
+            },
+
+            loadTags(){
+                axios.post(Telescope.basePath + '/telescope-api/tags')
+                    .then(response => {
+                        this.tags = response.data.tags;
+                    });
             }
         }
     }
@@ -266,13 +278,25 @@
 
 <template>
     <div class="card">
-        <div class="card-header d-flex align-items-center justify-content-between">
-            <h5>{{this.title}}</h5>
+        <div class="card-header row m-0">
+            <div class="col-sm-12 col-md-6 align-self-center mb-2 mt-2">
+                <h5>{{this.title}}</h5>
+            </div>
 
-            <input type="text" class="form-control w-25"
-                   v-if="tag || entries.length > 0"
+            <div class="col-md-3 col-sm-12 mb-2 mt-2">
+                <select class="form-control mr-3" v-model="tag" v-if="tags.length && (entries.length || tag)" @change="search($event)">
+                    <option value="">All</option>
+                    <option v-for="t in tags" :key="t.value" :value="t.value">
+                        {{ t.label }}
+                    </option>
+                </select>
+            </div>
+            <div class="col-md-3 col-sm-12 mb-2 mt-2">
+                <input type="text" class="form-control"
+                   v-if="!hideSearch && (tag || entries.length > 0)"
                    id="searchInput"
                    placeholder="Search Tag" v-model="tag" @input.stop="search">
+            </div>
         </div>
 
         <p v-if="recordingStatus !== 'enabled'" class="mt-0 mb-0 disabled-watcher d-flex align-items-center">
@@ -301,37 +325,38 @@
             <span>We didn't find anything - just empty space.</span>
         </div>
 
-
-        <table id="indexScreen" class="table table-hover table-sm mb-0 penultimate-column-right" v-if="ready && entries.length > 0">
-            <thead>
-            <slot name="table-header"></slot>
-            </thead>
-
-
-            <transition-group tag="tbody" name="list">
-                <tr v-if="hasNewEntries" key="newEntries" class="dontanimate">
-                    <td colspan="100" class="text-center card-bg-secondary py-1">
-                        <small><a href="#" v-on:click.prevent="loadNewEntries" v-if="!loadingNewEntries">Load New Entries</a></small>
-
-                        <small v-if="loadingNewEntries">Loading...</small>
-                    </td>
-                </tr>
+        <div class="table-responsive">
+            <table id="indexScreen" class="table table-hover table-sm mb-0 penultimate-column-right" v-if="ready && entries.length > 0">
+                <thead>
+                <slot name="table-header"></slot>
+                </thead>
 
 
-                <tr v-for="entry in entries" :key="entry.id">
-                    <slot name="row" :entry="entry"></slot>
-                </tr>
+                <transition-group tag="tbody" name="list">
+                    <tr v-if="hasNewEntries" key="newEntries" class="dontanimate">
+                        <td colspan="100" class="text-center card-bg-secondary py-1">
+                            <small><a href="#" v-on:click.prevent="loadNewEntries" v-if="!loadingNewEntries">Load New Entries</a></small>
+
+                            <small v-if="loadingNewEntries">Loading...</small>
+                        </td>
+                    </tr>
 
 
-                <tr v-if="hasMoreEntries" key="olderEntries" class="dontanimate">
-                    <td colspan="100" class="text-center card-bg-secondary py-1">
-                        <small><a href="#" v-on:click.prevent="loadOlderEntries" v-if="!loadingMoreEntries">Load Older Entries</a></small>
+                    <tr v-for="entry in entries" :key="entry.id">
+                        <slot name="row" :entry="entry"></slot>
+                    </tr>
 
-                        <small v-if="loadingMoreEntries">Loading...</small>
-                    </td>
-                </tr>
-            </transition-group>
-        </table>
 
+                    <tr v-if="hasMoreEntries" key="olderEntries" class="dontanimate">
+                        <td colspan="100" class="text-center card-bg-secondary py-1">
+                            <small><a href="#" v-on:click.prevent="loadOlderEntries" v-if="!loadingMoreEntries">Load Older Entries</a></small>
+
+                            <small v-if="loadingMoreEntries">Loading...</small>
+                        </td>
+                    </tr>
+                </transition-group>
+            </table>
+        </div>
+        
     </div>
 </template>

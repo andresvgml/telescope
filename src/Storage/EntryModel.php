@@ -65,6 +65,7 @@ class EntryModel extends Model
                 ->whereTag($query, $options)
                 ->whereFamilyHash($query, $options)
                 ->whereBeforeSequence($query, $options)
+                ->whereNotified($query, $options)
                 ->filter($query, $options);
 
         return $query;
@@ -147,6 +148,22 @@ class EntryModel extends Model
     {
         $query->when($options->beforeSequence, function ($query, $beforeSequence) {
             return $query->where('sequence', '<', $beforeSequence);
+        });
+
+        return $this;
+    }
+
+    /**
+     * Scope the query for the given notified status.
+     *
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
+     * @param  \Laravel\Telescope\Storage\EntryQueryOptions  $options
+     * @return $this
+     */
+    protected function whereNotified($query, EntryQueryOptions $options)
+    {
+        $query->when(!is_null($options->notified), function ($query, $notified) use($options) {
+            return $query->where('notified', $options->notified);
         });
 
         return $this;

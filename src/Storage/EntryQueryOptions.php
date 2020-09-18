@@ -49,6 +49,13 @@ class EntryQueryOptions
     public $limit = 50;
 
     /**
+     * The notified status that entries should have.
+     *
+     * @var bool
+     */
+    public $notified;
+
+    /**
      * Create new entry query options from the incoming request.
      *
      * @param  \Illuminate\Http\Request  $request
@@ -74,6 +81,17 @@ class EntryQueryOptions
     public static function forBatchId(?string $batchId)
     {
         return (new static)->batchId($batchId);
+    }
+
+    /**
+     * Create new entry query options for the given notified.
+     *
+     * @param  \Illuminate\Http\Request  $request
+     * @return static
+     */
+    public static function forNotified(bool $notified)
+    {
+        return (new static)->notified($notified);
     }
 
     /**
@@ -137,6 +155,19 @@ class EntryQueryOptions
     public function familyHash(?string $familyHash)
     {
         $this->familyHash = $familyHash;
+
+        return $this;
+    }
+
+    /**
+     * Set the notified that must belong to retrieved entries.
+     *
+     * @param  bool  $notified
+     * @return $this
+     */
+    public function notified(bool $notified)
+    {
+        $this->notified = $notified;
 
         return $this;
     }

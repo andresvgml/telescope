@@ -76,4 +76,6 @@ Route::post('/telescope-api/monitored-tags/delete', 'MonitoredTagController@dest
 // Toggle Recording...
 Route::post('/telescope-api/toggle-recording', 'RecordingController@toggle');
 
+Route::post('/telescope-api/tags', 'TagsController@index');
+
 Route::get('/{view?}', 'HomeController@index')->where('view', '(.*)')->name('telescope');
